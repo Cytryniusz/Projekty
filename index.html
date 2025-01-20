@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info.legend {
+            background: url('ski.jpg') no-repeat center center;
+            background-size: cover;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+            color: blue;
+            width: 300px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            text-align: left;
+            font-weight: bold;
+            border: 2px solid black;
+            overflow: auto;
+        }
+
+        .info.legend h4 {
+            margin: 0;
+            padding: 0;
+            font-weight: bold;
+            align-self: flex-start;
+        }
+
+        .info.legend i {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 8px;
+            vertical-align: middle;
+            margin-top: -2px;
+        }
+
+        #searchWrapper {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 330px;
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            gap: 8px;
+        }
+
+        #searchBox {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        #searchBox:focus {
+            outline: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        #clearSearchBox {
+            padding: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.95);
+            cursor: pointer;
+            font-size: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            color: #666;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        #clearSearchBox:hover {
+            background: rgba(255, 255, 255, 0.98);
+            color: #333;
+            transform: translateY(-1px);
+        }
+
+        #clearSearchBox.hidden {
+            display: none;
+        }
+
+        #resortList {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            backdrop-filter: blur(8px);
+        }
+
+        #resortList li {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+
+        #resortList li:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #000;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #filterWrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 160px;
+            z-index: 1000;
+        }
+
+        #filterWrapper1 {
+            position: absolute;
+            top: 60px;
+            left: 100px;
+            width: 160px;
+            z-index: 1000;
+        }
+
+        #filterTrails {
+            width: 120%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        #filterTrails:focus {
+            outline: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background-color: rgba(255, 255, 255, 0.98);
+        }
+
+        #filterVoivodeship {
+            width: 140%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        #filterVoivodeship:focus {
+            outline: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background-color: rgba(255, 255, 255, 0.98);
+        }
+
+        .custom-div-icon {
+            transition: all 0.3s ease;
+        }
+
+        .custom-div-icon:hover {
+            transform: scale(1.1);
+            z-index: 1000 !important;
+        }
+
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaflet-popup-content {
+            margin: 8px 12px;
+            line-height: 1.6;
+        }
+
+        .leaflet-popup-tip {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaflet-control-layers {
+            border: none !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(8px);
+        }
+
+        .leaflet-control-layers-toggle {
+            border-radius: 12px !important;
+        }
+
+        .leaflet-control-layers-expanded {
+            padding: 12px !important;
+            border-radius: 12px !important;
+            font-size: 14px;
+        }
+
+        .leaflet-bar {
+            border: none !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .leaflet-bar a {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: none !important;
+            color: #666 !important;
+            transition: all 0.3s ease;
+        }
+
+        .leaflet-bar a:hover {
+            background: rgba(255, 255, 255, 0.98) !important;
+            color: #333 !important;
+        }
+
+        .leaflet-control-scale {
+            border: none;
+        }
+    </style>
+    <title>Ośrodki Narciarskie w Polsce</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/ico" href="ski_ressort_icon.ico"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<div id="map">
+    <div id="searchWrapper" style="position: absolute; top: 15px;">
+        <input type="text" id="searchBox" placeholder="Znajdź ośrodek narciarski...">
+        <button id="clearSearchBox" class="hidden">x</button>
+    </div>
+
+    <ul id="resortList"></ul>
+
+    <div id="filterWrapper" style="position: absolute; top: 15px; left: 600px;">
+        <select id="filterTrails">
+            <option value="all">Wszystkie Ośrodki</option>
+            <option value="small">Małe</option>
+            <option value="medium">Średnie</option>
+            <option value="large">Duże</option>
+        </select>
+    </div>
+
+    <div id="filterWrapper1" style="position: absolute; top: 15px; left: 373px;">
+        <select id="filterVoivodeship">
+            <option value="all">Wszystkie Województwa</option>
+            <option value="Dolnośląskie">Dolnośląskie</option>
+            <option value="Kujawsko-Pomorskie">Kujawsko-Pomorskie</option>
+            <option value="Lubelskie">Lubelskie</option>
+            <option value="Lubuskie">Lubuskie</option>
+            <option value="Łódzkie">Łódzkie</option>
+            <option value="Małopolskie">Małopolskie</option>
+            <option value="Mazowieckie">Mazowieckie</option>
+            <option value="Opolskie">Opolskie</option>
+            <option value="Podkarpackie">Podkarpackie</option>
+            <option value="Podlaskie">Podlaskie</option>
+            <option value="Pomorskie">Pomorskie</option>
+            <option value="Śląskie">Śląskie</option>
+            <option value="Świętokrzyskie">Świętokrzyskie</option>
+            <option value="Warmińsko-Mazurskie">Warmińsko-Mazurskie</option>
+            <option value="Wielkopolskie">Wielkopolskie</option>
+            <option value="Zachodniopomorskie">Zachodniopomorskie</option>
+        </select>
+    </div>
+
+    <link rel="stylesheet" href="leaflet/leaflet.css">
+    <link rel="stylesheet" href="Leaflet.Measure-master/src/leaflet.measure.css">
+    <link rel="stylesheet" href="BeautifyMarker-master/leaflet-beautify-marker-icon.css"/>
+    <link rel="stylesheet" href="leaflet-dataclassification-main/leaflet-dataclassification.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <script src="leaflet/leaflet.js"></script>
+    <script src="Leaflet.Measure-master/src/leaflet.measure.js"></script>
+    <script src="BeautifyMarker-master/leaflet-beautify-marker-icon.js"></script>
+    <script src="leaflet-dataclassification-main/leaflet-dataclassification.js"></script>
+
+    <script>
+        const mymap = L.map('map', {maxZoom: 20}).setView([52.02, 20.19], 6);
+
+        // Lista ośrodków narciarskich na podstawie wikipedii https://pl.wikipedia.org/wiki/O%C5%9Brodki_narciarskie_w_Polsce
+        const geojson_points = {"type": "FeatureCollection","name": "osrodki_narciarskie","crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84"}},"features": [
+                {"type": "Feature","properties": {"nazwa": "SkiArena Szrenica","liczba_wyciagow": 5,"liczba_tras": 6,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.516944, 50.818333]}},
+                {"type": "Feature","properties": {"nazwa": "Kompleks Narciarski Kopa w Karpaczu","liczba_wyciagow": 7,"liczba_tras": 8,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.729083, 50.767083]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Biały Jar w Karpaczu","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.738056, 50.772833]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Czarna Góra","liczba_wyciagow": 9,"liczba_tras": 12,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [16.81897901101276, 50.26015596922293]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Kamienica","liczba_wyciagow": 4,"liczba_tras": 5,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [16.886389, 50.251111]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Zieleniec","liczba_wyciagow": 24,"liczba_tras": 22,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [16.383056, 50.338056]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Ski & Sun Świeradów-Zdrój","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.319722, 50.910417]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Sportowo-Rekreacyjny Góra Dzikowiec w Boguszowie-Gorcach","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [16.219833, 50.724389]}},
+                {"type": "Feature","properties": {"nazwa": "Narciarski Raj w Chrzanowie","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Lubelskie"},"geometry": {"type": "Point","coordinates": [22.625372, 50.779811]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Sportu i Rekreacji Góra Kamieńsk","liczba_wyciagow": 2,"liczba_tras": 2,"wojewodztwo": "Łódzkie"},"geometry": {"type": "Point","coordinates": [19.436722, 51.231944]}},
+                {"type": "Feature","properties": {"nazwa": "SkiPark Magura na Magurze Małastowskiej","liczba_wyciagow": 2,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [21.240667, 49.550778]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Laskowa-Kamionna","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.41975, 49.777611]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Limanowa-Ski","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.453889, 49.724222]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Kasina Ski w Kasinie Wielkiej","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.15225, 49.718944]}},
+                {"type": "Feature","properties": {"nazwa": "Ostoja Górska Koninki w Porębie Wielkiej","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.066056, 49.575306]}},
+                {"type": "Feature","properties": {"nazwa": "Sport Arena Myślenice","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.948667, 49.799722]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Szklana Góra Ski w Harbutowicach","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.785944, 49.812639]}},
+                {"type": "Feature","properties": {"nazwa": "Słotwiny Arena w Krynicy","liczba_wyciagow": 4,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.935556, 49.432778]}},
+                {"type": "Feature","properties": {"nazwa": "Kompleks Narciarski Słotwiny w Krynicy","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.935056, 49.437639]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Henryk-Ski w Krynicy","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.955556, 49.423611]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Jaworzyna Krynicka","liczba_wyciagow": 7,"liczba_tras": 8,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.926111, 49.419167]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Tylicz","liczba_wyciagow": 5,"liczba_tras": 6,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.995222, 49.383861]}},
+                {"type": "Feature","properties": {"nazwa": "Centrum Narciarskie Master-Ski w Tyliczu","liczba_wyciagow": 4,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [21.026583, 49.3925]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Dwie Doliny Muszyna-Wierchomla","liczba_wyciagow": 10,"liczba_tras": 11,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.8335, 49.409167]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarsko-Rekreacyjny Ryterski Raj w Rytrze","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.651056, 49.485944]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Czorsztyn-Ski w Kluszkowcach","liczba_wyciagow": 6,"liczba_tras": 7,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.318611, 49.456667]}},
+                {"type": "Feature","properties": {"nazwa": "Kompleks Beskid Spytkowice","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.79075, 49.565556]}},
+                {"type": "Feature","properties": {"nazwa": "Arena Narciarska Jaworki-Homole","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.555556, 49.405556]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Palenica w Szczawnicy","liczba_wyciagow": 4,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.479722, 49.424167]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Turystyczno-Narciarski Mosorny Groń w Zawoi","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.539833, 49.641639]}},
+                {"type": "Feature","properties": {"nazwa": "Wyciągi Narciarskie Bania w Białce Tatrzańskiej","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.133333, 49.383333]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Kaniówka w Białce Tatrzańskiej","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.105556, 49.363889]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Kotelnica Białczańska w Białce Tatrzańskiej","liczba_wyciagow": 6,"liczba_tras": 9,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.097778, 49.390000]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Rusiń-ski w Bukowinie Tatrzańskiej","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.098167, 49.352639]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Turnia w Bukowinie Tatrzańskiej","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.092028, 49.333778]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Grapa-Litwinka w Czarnej Górze","liczba_wyciagow": 4,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.124722, 49.381111]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Koziniec w Czarnej Górze","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.132228, 49.36685]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Jurgów","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.166667, 49.311111]}},
+                {"type": "Feature","properties": {"nazwa": "Butorowy Wierch","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.905556, 49.300833]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Witów-Ski w Witowie","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.825278, 49.321667]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Małe Ciche","liczba_wyciagow": 4,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.074333, 49.301944]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Suche","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.977222, 49.337222]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Kasprowy Wierch w Zakopanem","liczba_wyciagow": 3,"liczba_tras": 2,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9815, 49.2315]}},
+                {"type": "Feature","properties": {"nazwa": "Gubałówka","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9327, 49.3065]}},
+                {"type": "Feature","properties": {"nazwa": "Centrum Narciarskie Nosal w Zakopanem","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9884, 49.2784]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarsko-Rekreacyjny Harenda w Zakopanem","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9789, 49.3217]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Polana Szymoszkowa w Zakopanem","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9286, 49.2937]}},
+                {"type": "Feature","properties": {"nazwa": "Ski Centrum Czarny Groń w Rzykach","liczba_wyciagow": 5,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.3958, 49.7744]}},
+                {"type": "Feature","properties": {"nazwa": "Całoroczny Stok Narciarski Szczęśliwice","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Mazowieckie"},"geometry": {"type": "Point","coordinates": [20.9572, 52.2050]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Laworta w Ustrzykach Dolnych","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.5683, 49.4497]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Sportów Zimowych KiczeraSki w Puławach Górnych","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [21.9338, 49.4924]}},
+                {"type": "Feature","properties": {"nazwa": "Przemyski Ośrodek Sportu i Rekreacji","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.7653, 49.7729]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Rekreacyjno-Narciarski Dębowiec","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.0162, 49.7864]}},
+                {"type": "Feature","properties": {"nazwa": "Kolej gondolowa Szyndzielnia","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.0106, 49.7757]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski COS OPO w Szczyrku","liczba_wyciagow": 6,"liczba_tras": 12,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.0133, 49.7068]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Czyrna-Solisko w Szczyrku","liczba_wyciagow": 5,"liczba_tras": 10,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.9742, 49.6827]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Beskid Sport Arena w Szczyrku","liczba_wyciagow": 4,"liczba_tras": 8,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.0031, 49.7211]}},
+                {"type": "Feature","properties": {"nazwa": "Kompleks Zagroń Istebna","liczba_wyciagow": 4,"liczba_tras": 8,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.9056, 49.5742]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Złoty Groń w Istebnej","liczba_wyciagow": 3,"liczba_tras": 6,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.9176, 49.5725]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek narciarski Kolej Linowa Czantoria w Ustroniu","liczba_wyciagow": 2,"liczba_tras": 4,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8274, 49.6965]}},
+                {"type": "Feature","properties": {"nazwa": "Kolej Linowa Palenica w Ustroniu","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8458, 49.7035]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Poniwiec Mała Czantoria w Ustroniu","liczba_wyciagow": 2,"liczba_tras": 4,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.7875, 49.6912]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Cieńków w Wiśle","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.9309, 49.6322]}},
+                {"type": "Feature","properties": {"nazwa": "Wyciągi Narciarskie Klepki Wisła Malinka","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.9225, 49.6320]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Nowa Osada w Wiśle","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8899, 49.6369]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek narciarski Skolnity w Wiśle","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8533, 49.6547]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Soszów w Wiśle","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8177, 49.6417]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja narciarska Stok w Wiśle","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8251, 49.6596]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Stożek w Wiśle","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8342, 49.6037]}},
+                {"type": "Feature","properties": {"nazwa": "Góra Żar w Międzybrodziu Żywieckim","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.2220, 49.7754]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Pilsko w Korbielowie","liczba_wyciagow": 5,"liczba_tras": 8,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.3474, 49.5603]}},
+                {"type": "Feature","properties": {"nazwa": "Kolej Baba w Korbielowie Kamiennej","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.3461, 49.5617]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Zwardoń Ski","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.9822, 49.5072]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Szwajcaria Bałtowska","liczba_wyciagow": 5,"liczba_tras": 8,"wojewodztwo": "Świętokrzyskie"},"geometry": {"type": "Point","coordinates": [21.5509, 51.0148]}},
+                {"type": "Feature","properties": {"nazwa": "Centrum Sportowo-Rekreacyjne Piękna Góra w Gołdapi","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [22.2935, 54.2821]}},
+                {"type": "Feature","properties": {"nazwa": "Stok narciarski GołębiewSKI w Mikołajkach","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [21.5573, 53.8073]}},
+                {"type": "Feature","properties": {"nazwa": "Całoroczne Centrum Narciarstwa MaltaSki w Poznaniu","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Wielkopolskie"},"geometry": {"type": "Point","coordinates": [16.9802, 52.4000]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek reakreacyjno-sportowy Góra Czterech Wiatrów","liczba_wyciagow": 2,"liczba_tras": 5,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [21.3266, 53.8584]}}
+            ]};
+
+        // Warstwa punktów
+        const points_layer = L.geoJSON(geojson_points, {
+            onEachFeature: onEachFeature,
+            pointToLayer: pointToLayer
+        });
+
+        mymap.addLayer(points_layer);
+
+        // Funkcja wyświetlająca popup
+        function onEachFeature(feature, layer) {
+            const props = feature.properties;
+            layer.bindPopup(
+                `<b>${props.nazwa}</b><br>Liczba wyciągów: ${props.liczba_wyciagow}<br>Liczba tras: ${props.liczba_tras}`
+            );
+        }
+
+        // Funkcja tworząca ikony
+        function pointToLayer(feature, latlng) {
+            const liczba_tras = feature.properties.liczba_tras;
+            const size = getSize(liczba_tras);
+
+            // Create the custom icon without color
+            const icon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="
+            width: ${size}px;
+            height: ${size}px;
+            background-image: url('skies.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        "></div>`,
+                iconSize: [size, size],
+                iconAnchor: [size / 2, size / 2],
+                popupAnchor: [0, -size / 2]
+            });
+
+            return L.marker(latlng, { icon: icon });
+        }
+
+        function getSize(liczba_tras) {
+            if (liczba_tras > 10) return 35;
+            if (liczba_tras > 5) return 25;
+            return 15;
+        }
+
+        // Legenda
+        const legend = L.control({position: 'bottomright'});
+        legend.onAdd = function () {
+            const div = L.DomUtil.create('div', 'info legend');
+            div.innerHTML += '<h4 style="text-align: center; font-weight: bold; color: black;">Legenda:</h4>';
+            div.innerHTML += '<div style="display: flex; align-items: center; margin-bottom: 8px; font-weight: bold; color: blue;">' +
+                '<div style="width: 35px; height: 35px; background-image: url(\'skies.png\'); background-size: contain; background-repeat: no-repeat; background-position: center; margin-right: 8px;"></div>' +
+                ' Duży ośrodek (> 10 tras)</div>';
+            div.innerHTML += '<div style="display: flex; align-items: center; margin-bottom: 8px; font-weight: bold; color: blue;">' +
+                '<div style="width: 25px; height: 25px; background-image: url(\'skies.png\'); background-size: contain; background-repeat: no-repeat; background-position: center; margin-right: 8px;"></div>' +
+                ' Średni ośrodek (6-10 tras)</div>';
+            div.innerHTML += '<div style="display: flex; align-items: center; margin-bottom: 8px; font-weight: bold; color: blue;">' +
+                '<div style="width: 15px; height: 15px; background-image: url(\'skies.png\'); background-size: contain; background-repeat: no-repeat; background-position: center; margin-right: 8px;"></div>' +
+                ' Mały ośrodek (≤ 5 tras)</div>';
+            return div;
+        };
+        legend.addTo(mymap);
+        legend.addTo(mymap);
+
+        // Skala
+        L.control.scale().addTo(mymap);
+
+        // Funkcja spłaszczająca tablicę cech
+        function flattenFeatures(features) {
+            let flatFeatures = [];
+            features.forEach(feature => {
+                if (feature.type === "FeatureCollection") {
+                    flatFeatures = flatFeatures.concat(flattenFeatures(feature.features));
+                } else {
+                    flatFeatures.push(feature);
+                }
+            });
+            return flatFeatures;
+        }
+
+        // Spłaszczanie tablicy cech
+        const flatFeatures = flattenFeatures(geojson_points.features);
+
+        // Wyszukiwanie ośrodków narciarskich
+        document.getElementById('searchBox').addEventListener('input', function (e) {
+            const query = e.target.value.toLowerCase();
+            const list = document.getElementById('resortList');
+            const clearButton = document.getElementById('clearSearchBox');
+            list.innerHTML = '';
+
+            if (query) {
+                list.classList.remove('hidden');
+                clearButton.classList.remove('hidden');
+                flatFeatures.forEach(feature => {
+                    if (feature.properties.nazwa.toLowerCase().includes(query)) {
+                        const li = document.createElement('li');
+                        li.textContent = feature.properties.nazwa;
+                        li.onclick = () => {
+                            const [lng, lat] = feature.geometry.coordinates;
+                            mymap.setView([lat, lng], 13);
+                            document.getElementById('searchBox').value = feature.properties.nazwa; // Set full name in searchBox
+                        };
+                        list.appendChild(li);
+                    }
+                });
+            } else {
+                list.classList.add('hidden');
+                clearButton.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('clearSearchBox').addEventListener('click', function () {
+            const searchBox = document.getElementById('searchBox');
+            searchBox.value = '';
+            searchBox.dispatchEvent(new Event('input'));
+            mymap.setView([52.02, 20.19], 6);
+        });
+
+        // Filtrowanie ośrodków narciarskich
+        document.getElementById('filterTrails').addEventListener('change', filterResorts);
+        document.getElementById('filterVoivodeship').addEventListener('change', filterResorts);
+
+        function filterResorts() {
+            const trailValue = document.getElementById('filterTrails').value;
+            const voivodeshipValue = document.getElementById('filterVoivodeship').value;
+            points_layer.clearLayers();
+
+            const filteredFeatures = geojson_points.features.filter(feature => {
+                const liczba_tras = feature.properties.liczba_tras;
+                const wojewodztwo = feature.properties.wojewodztwo;
+
+                const trailMatch = (trailValue === 'all') ||
+                    (trailValue === 'small' && liczba_tras <= 5) ||
+                    (trailValue === 'medium' && liczba_tras > 5 && liczba_tras <= 10) ||
+                    (trailValue === 'large' && liczba_tras > 10);
+
+                const voivodeshipMatch = (voivodeshipValue === 'all') || (wojewodztwo === voivodeshipValue);
+
+                return trailMatch && voivodeshipMatch;
+            });
+
+            points_layer.addData(filteredFeatures);
+        }
+
+        // Wtyczka leaflet-measure
+        const measureControl = new L.Control.Measure({
+            primaryLengthUnit: 'kilometers',
+            secondaryLengthUnit: 'meters',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'sqkilometers',
+            activeColor: '#FF0000',
+            completedColor: '#00FF00',
+            position: 'topright'
+        }).addTo(mymap);
+
+        // Warstwa OpenStreetMap OSM
+        const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {
+            foo: 'bar',
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        osm.addTo(mymap);
+
+        // Warstwa OpenTopoMap
+        const hillshadeLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+            attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> contributors'
+        }).addTo(mymap);
+
+        // Warstwa OpenStreetMap WMS
+        const wmsLayer = L.tileLayer.wms('https://ows.terrestris.de/osm/service?', {
+            layers: 'OSM-WMS',
+            format: 'image/png',
+            transparent: true,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+        wmsLayer.addTo(mymap);
+
+        // Warstwa CartoDB Positron
+        const cartoDBPositron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>'
+        });
+
+        // Warstwa WMTS
+        const wmtsLayer = L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri'
+        });
+        wmtsLayer.addTo(mymap);
+
+        // Panel warstw
+        const baseLayers = {
+            "Hillshade": hillshadeLayer,
+            "OSM": osm,
+            "CartoDB Positron": cartoDBPositron,
+            "WMTS": wmtsLayer,
+            "WMS": wmsLayer
+        };
+
+
+        L.control.layers(baseLayers, null, {position: 'topright'}).addTo(mymap);
+    </script>
+</div>
+</body>
+</html>
