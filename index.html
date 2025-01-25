@@ -14,8 +14,6 @@
         }
 
         .info.legend {
-            background: url('ski.jpg') no-repeat center center;
-            background-size: cover;
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -25,29 +23,13 @@
             height: 400px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: flex-start;
             text-align: left;
             font-weight: bold;
             border: 2px solid black;
             overflow: auto;
-        }
-
-        .info.legend h4 {
-            margin: 0;
-            padding: 0;
-            font-weight: bold;
-            align-self: flex-start;
-        }
-
-        .info.legend i {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            margin-right: 8px;
-            vertical-align: middle;
-            margin-top: -2px;
+            position: relative;
         }
 
         #searchWrapper {
@@ -330,7 +312,7 @@
     <script>
         const mymap = L.map('map', {maxZoom: 20}).setView([52.02, 20.19], 6);
 
-        // Lista ośrodków narciarskich na podstawie wikipedii https://pl.wikipedia.org/wiki/O%C5%9Brodki_narciarskie_w_Polsce
+        // Lista ośrodków narciarskich na podstawie wikipedii https://pl.wikipedia.org/wiki/O%C5%9Brodki_narciarskie_w_Polsce, skiinfo.pl https://www.skiinfo.pl/ oraz narty.pl https://www.narty.pl/
         const geojson_points = {"type": "FeatureCollection","name": "osrodki_narciarskie","crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84"}},"features": [
                 {"type": "Feature","properties": {"nazwa": "SkiArena Szrenica","liczba_wyciagow": 5,"liczba_tras": 6,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.516944, 50.818333]}},
                 {"type": "Feature","properties": {"nazwa": "Kompleks Narciarski Kopa w Karpaczu","liczba_wyciagow": 7,"liczba_tras": 8,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.729083, 50.767083]}},
@@ -373,7 +355,7 @@
                 {"type": "Feature","properties": {"nazwa": "Butorowy Wierch","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.905556, 49.300833]}},
                 {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Witów-Ski w Witowie","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.825278, 49.321667]}},
                 {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Małe Ciche","liczba_wyciagow": 4,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.074333, 49.301944]}},
-                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Suche","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.977222, 49.337222]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Suche","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.98133, 49.33564]}},
                 {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Kasprowy Wierch w Zakopanem","liczba_wyciagow": 3,"liczba_tras": 2,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9815, 49.2315]}},
                 {"type": "Feature","properties": {"nazwa": "Gubałówka","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9327, 49.3065]}},
                 {"type": "Feature","properties": {"nazwa": "Centrum Narciarskie Nosal w Zakopanem","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9884, 49.2784]}},
@@ -381,7 +363,7 @@
                 {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Polana Szymoszkowa w Zakopanem","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9286, 49.2937]}},
                 {"type": "Feature","properties": {"nazwa": "Ski Centrum Czarny Groń w Rzykach","liczba_wyciagow": 5,"liczba_tras": 4,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.3958, 49.7744]}},
                 {"type": "Feature","properties": {"nazwa": "Całoroczny Stok Narciarski Szczęśliwice","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Mazowieckie"},"geometry": {"type": "Point","coordinates": [20.9572, 52.2050]}},
-                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Laworta w Ustrzykach Dolnych","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.5683, 49.4497]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Laworta w Ustrzykach Dolnych","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.5906, 49.4511]}},
                 {"type": "Feature","properties": {"nazwa": "Ośrodek Sportów Zimowych KiczeraSki w Puławach Górnych","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [21.9338, 49.4924]}},
                 {"type": "Feature","properties": {"nazwa": "Przemyski Ośrodek Sportu i Rekreacji","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.7653, 49.7729]}},
                 {"type": "Feature","properties": {"nazwa": "Ośrodek Rekreacyjno-Narciarski Dębowiec","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.0162, 49.7864]}},
@@ -409,7 +391,41 @@
                 {"type": "Feature","properties": {"nazwa": "Centrum Sportowo-Rekreacyjne Piękna Góra w Gołdapi","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [22.2935, 54.2821]}},
                 {"type": "Feature","properties": {"nazwa": "Stok narciarski GołębiewSKI w Mikołajkach","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [21.5573, 53.8073]}},
                 {"type": "Feature","properties": {"nazwa": "Całoroczne Centrum Narciarstwa MaltaSki w Poznaniu","liczba_wyciagow": 4,"liczba_tras": 6,"wojewodztwo": "Wielkopolskie"},"geometry": {"type": "Point","coordinates": [16.9802, 52.4000]}},
-                {"type": "Feature","properties": {"nazwa": "Ośrodek reakreacyjno-sportowy Góra Czterech Wiatrów","liczba_wyciagow": 2,"liczba_tras": 5,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [21.3266, 53.8584]}}
+                {"type": "Feature","properties": {"nazwa": "Ośrodek reakreacyjno-sportowy Góra Czterech Wiatrów","liczba_wyciagow": 2,"liczba_tras": 5,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [21.3266, 53.8584]}},
+                {"type": "Feature","properties": {"nazwa": "Ski Arena Łysa Góra","liczba_wyciagow": 6,"liczba_tras": 6,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.8029, 50.9613]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska „Gromadzyń” ","liczba_wyciagow": 6,"liczba_tras": 6,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.5957, 49.4193]}},
+                {"type": "Feature","properties": {"nazwa": "LESKO SUMMER  SKI & w Weremieniu ","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.3177, 49.4471]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska BIESZCZAD.ski Wańkowa ","liczba_wyciagow": 5,"liczba_tras": 7,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.4714, 49.5070]}},
+                {"type": "Feature","properties": {"nazwa": "Karlików Ośrodek narciarski ","liczba_wyciagow": 3,"liczba_tras": 3,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.0549, 49.4712]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Pod Wangiem ","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.7294, 50.7793]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Niestachów ","liczba_wyciagow": 5,"liczba_tras": 5,"wojewodztwo": "Świętokrzyskie"},"geometry": {"type": "Point","coordinates": [20.7410, 50.8352]}},
+                {"type": "Feature","properties": {"nazwa": "Kielce - Telegraf Ośrodek narciarski ","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Świętokrzyskie"},"geometry": {"type": "Point","coordinates": [20.6429, 50.8404]}},
+                {"type": "Feature","properties": {"nazwa": "Koszałkowo-Wieżyca Ośrodek narciarski ","liczba_wyciagow": 8,"liczba_tras": 7,"wojewodztwo": "Pomorskie"},"geometry": {"type": "Point","coordinates": [18.1026, 54.2337]}},
+                {"type": "Feature","properties": {"nazwa": "Krynica - Góra Parkowa Ośrodek narciarski ","liczba_wyciagow": 2,"liczba_tras": 2,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.9666, 49.4156]}},
+                {"type": "Feature","properties": {"nazwa": "Lądek Zdrój Ośrodek narciarski ","liczba_wyciagow": 3,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [16.8959, 50.3474]}},
+                {"type": "Feature","properties": {"nazwa": "Podstolice SKI ","liczba_wyciagow": 3,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9924, 49.9523]}},
+                {"type": "Feature","properties": {"nazwa": "Kartasiówka Stacja narciarska ","liczba_wyciagow": 3,"liczba_tras": 3,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [20.4784, 53.6991]}},
+                {"type": "Feature","properties": {"nazwa": "Środula Sport - Sosnowiec ","liczba_wyciagow": 3,"liczba_tras": 2,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.1685, 50.2915]}},
+                {"type": "Feature","properties": {"nazwa": "Stok Narciarski Stadion Kielce ","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Świętokrzyskie"},"geometry": {"type": "Point","coordinates": [20.6040, 50.8415]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja narciarska Konary ","liczba_wyciagow": 2,"liczba_tras": 2,"wojewodztwo": "Świętokrzyskie"},"geometry": {"type": "Point","coordinates": [21.3742, 50.6889]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja narciarska Kazimierz Dolny ","liczba_wyciagow": 5,"liczba_tras": 6,"wojewodztwo": "Lubelskie"},"geometry": {"type": "Point","coordinates": [21.9791, 51.3378]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja narciarska CZARNÓW ","liczba_wyciagow": 2,"liczba_tras": 4,"wojewodztwo": "Dolnośląskie"},"geometry": {"type": "Point","coordinates": [15.9343, 50.7921]}},
+                {"type": "Feature","properties": {"nazwa": "Siepraw Ski ","liczba_wyciagow": 5,"liczba_tras": 5,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9949, 49.9050]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja Narciarska Arłamów ","liczba_wyciagow": 2,"liczba_tras": 2,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.6275, 49.5895]}},
+                {"type": "Feature","properties": {"nazwa": "Stok narciarski w Batorzu ","liczba_wyciagow": 3,"liczba_tras": 6,"wojewodztwo": "Lubelskie"},"geometry": {"type": "Point","coordinates": [22.4940, 50.8542]}},
+                {"type": "Feature","properties": {"nazwa": "Stok Bobliwo ","liczba_wyciagow": 2,"liczba_tras": 1,"wojewodztwo": "Lubelskie"},"geometry": {"type": "Point","coordinates": [23.0544, 50.9029]}},
+                {"type": "Feature","properties": {"nazwa": "Brenna WęgierSKI ","liczba_wyciagow": 5,"liczba_tras": 5,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.9709, 49.7108]}},
+                {"type": "Feature","properties": {"nazwa": "BYSTRE SKI ","liczba_wyciagow": 1,"liczba_tras": 2,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [22.2708, 49.3158]}},
+                {"type": "Feature","properties": {"nazwa": "Chyrowa-SKI ","liczba_wyciagow": 3,"liczba_tras": 4,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [21.6145, 49.5328]}},
+                {"type": "Feature","properties": {"nazwa": "Stacja narciarska Cisowa ","liczba_wyciagow": 2,"liczba_tras": 2,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [19.7240, 50.4520]}},
+                {"type": "Feature","properties": {"nazwa": "Czerwienne Ski ","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [19.9359, 49.3809]}},
+                {"type": "Feature","properties": {"nazwa": "Dolomity Ski Dolina - Bytom ","liczba_wyciagow": 3,"liczba_tras": 3,"wojewodztwo": "Śląskie"},"geometry": {"type": "Point","coordinates": [18.8594, 50.4030]}},
+                {"type": "Feature","properties": {"nazwa": "Dylewska Góra ","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [19.9403, 53.5500]}},
+                {"type": "Feature","properties": {"nazwa": "Ośrodek Narciarski Dąbrówka ","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Podlaskie"},"geometry": {"type": "Point","coordinates": [22.9744, 54.1079]}},
+                {"type": "Feature","properties": {"nazwa": "Długa Polana ","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Małopolskie"},"geometry": {"type": "Point","coordinates": [20.0658, 49.5042]}},
+                {"type": "Feature","properties": {"nazwa": "Góra Radostowa ","liczba_wyciagow": 1,"liczba_tras": 1,"wojewodztwo": "Świętokrzyskie"},"geometry": {"type": "Point","coordinates": [20.8025, 50.8983]}},
+                {"type": "Feature","properties": {"nazwa": "Kurza Góra ","liczba_wyciagow": 5,"liczba_tras": 3,"wojewodztwo": "Warmińsko-Mazurskie"},"geometry": {"type": "Point","coordinates": [19.5901, 53.3978]}},
+                {"type": "Feature","properties": {"nazwa": "Kompleks Rekreacyjno – Wypoczynkowy OAZA ","liczba_wyciagow": 2,"liczba_tras": 3,"wojewodztwo": "Podkarpackie"},"geometry": {"type": "Point","coordinates": [21.7758, 49.8790]}}
             ]};
 
         // Warstwa punktów
@@ -462,6 +478,7 @@
         const legend = L.control({position: 'bottomright'});
         legend.onAdd = function () {
             const div = L.DomUtil.create('div', 'info legend');
+            div.innerHTML += '<div class="legend-image"></div>';
             div.innerHTML += '<h4 style="text-align: center; font-weight: bold; color: black;">Legenda:</h4>';
             div.innerHTML += '<div style="display: flex; align-items: center; margin-bottom: 8px; font-weight: bold; color: blue;">' +
                 '<div style="width: 35px; height: 35px; background-image: url(\'skies.png\'); background-size: contain; background-repeat: no-repeat; background-position: center; margin-right: 8px;"></div>' +
@@ -472,9 +489,9 @@
             div.innerHTML += '<div style="display: flex; align-items: center; margin-bottom: 8px; font-weight: bold; color: blue;">' +
                 '<div style="width: 15px; height: 15px; background-image: url(\'skies.png\'); background-size: contain; background-repeat: no-repeat; background-position: center; margin-right: 8px;"></div>' +
                 ' Mały ośrodek (≤ 5 tras)</div>';
+            div.innerHTML += '<img src="ski.jpg" style="width: 90%; height: auto; display: block; margin: 0 auto;">';
             return div;
         };
-        legend.addTo(mymap);
         legend.addTo(mymap);
 
         // Skala
